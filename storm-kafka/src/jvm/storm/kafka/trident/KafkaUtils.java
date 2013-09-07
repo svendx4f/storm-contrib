@@ -5,6 +5,9 @@ import java.net.ConnectException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
+
 import kafka.api.FetchRequest;
 import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.javaapi.message.ByteBufferMessageSet;
@@ -16,8 +19,13 @@ import storm.trident.topology.TransactionAttempt;
 
 public class KafkaUtils {
     
+	public static final Logger LOG = Logger.getLogger(KafkaUtils.class);
+
     
      public static Map emitPartitionBatchNew(TridentKafkaConfig config, int partition, SimpleConsumer consumer, TransactionAttempt attempt, TridentCollector collector, Map lastMeta, String topologyInstanceId) {
+    	 
+    	 traceReattempt(config, attempt);
+    	 
          StaticHosts hosts = (StaticHosts) config.hosts;
          long offset;
          if(lastMeta!=null) {
@@ -59,4 +67,12 @@ public class KafkaUtils {
              collector.emit(values);
          }
      }
+     
+     
+     private static void traceReattempt(TridentKafkaConfig config, TransactionAttempt attempt) {
+    	 if (config != null && config.traceReAttempts && attempt != null && attempt.getAttemptId() > 0) {
+    		 LOG.info(String.format("Re-attempting transaction id %d, attempt id is %d", attempt.getTransactionId(), attempt.getAttemptId()));
+    	 }
+     }
+     
 }
