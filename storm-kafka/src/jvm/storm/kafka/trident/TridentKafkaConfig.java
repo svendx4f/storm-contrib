@@ -5,7 +5,11 @@ import storm.kafka.KafkaConfig;
 
 public class TridentKafkaConfig extends KafkaConfig {
     public TridentKafkaConfig(BrokerHosts hosts, String topic) {
-        super(hosts, topic);
+        this(hosts, topic, false);
+    }
+    
+    public TridentKafkaConfig(BrokerHosts hosts, String topic, Boolean traceReAttempts) {
+    	super(hosts, topic);
     }
     
     public IBatchCoordinator coordinator = new DefaultCoordinator();

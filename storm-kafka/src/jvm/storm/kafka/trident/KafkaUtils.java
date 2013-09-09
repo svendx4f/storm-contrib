@@ -9,6 +9,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import kafka.api.FetchRequest;
+import kafka.common.OffsetOutOfRangeException;
 import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.javaapi.message.ByteBufferMessageSet;
 import kafka.message.Message;
@@ -50,10 +51,10 @@ public class KafkaUtils {
              }
          }
          long endoffset = offset;
-         for(MessageAndOffset msg: msgs) {
-             emit(config, attempt, collector, msg.message());
-             endoffset = msg.offset();
-         }
+	         for(MessageAndOffset msg: msgs) {
+	             emit(config, attempt, collector, msg.message());
+	             endoffset = msg.offset();
+	         }
          Map newMeta = new HashMap();
          newMeta.put("offset", offset);
          newMeta.put("nextOffset", endoffset);
