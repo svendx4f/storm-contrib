@@ -50,11 +50,16 @@ public class KafkaUtils {
                  throw new RuntimeException(e);
              }
          }
-         long endoffset = offset;
+         try {
+        	 long endoffset = offset;
 	         for(MessageAndOffset msg: msgs) {
 	             emit(config, attempt, collector, msg.message());
 	             endoffset = msg.offset();
 	         }
+         } catch (OffsetOutOfRangeException exc) {
+        	 LOG.warn("Offset from last meta are (now) invalid, maybe Kafka discarded that message (see Kafka log retention). Reseting offset meta-data", exc);
+        	 return null;
+         }
          Map newMeta = new HashMap();
          newMeta.put("offset", offset);
          newMeta.put("nextOffset", endoffset);
